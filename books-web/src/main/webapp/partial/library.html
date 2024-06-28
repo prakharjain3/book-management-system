@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="well well-sm">
+      <form class="form-horizontal form-book-search" role="form">
+        <div class="form-group">
+          <label class="sr-only" for="inputSearch">Search</label>
+          <div class="col-md-12">
+            <input type="text" class="form-control" ng-model="search.text" id="inputSearch" placeholder="Search" />
+          </div>
+        </div>
+        <hr style="border-width: 2px; border-color: lightgray;">
+        <div class="form-group">
+          <label for="inputMinRating" style="padding-left: 20px;">Rating :</label>
+          <div class="col-md-12">
+            <input type="number" class="form-control" id="inputMinRating" ng-model="minRating"
+              placeholder="Enter rating" max="9" min="0" />
+          </div>
+        </div>
+        <br>
+        <button type="button" class="btn btn-primary" ng-click="filterUsingRating()">Apply Filter</button>
+        <br>
+        <label>Genres :</label>
+        <div class="checkbox" ng-repeat="genre in availableGenres">
+          <label>
+            <input type="checkbox" ng-model="genre.selected"> {{ genre.name }}
+          </label>
+        </div>
+      
+        <button type="button" class="btn btn-primary" ng-click="filterUsingGenre()">Apply Filter</button>
+        <br>
+        <label>Authors :</label>
+        <div class="checkbox" ng-repeat="author in authors">
+          <label>
+            <input type="checkbox" ng-model="author.selected"> {{ author.name }}
+          </label>
+        </div>
+
+        <button type="button" class="btn btn-primary" ng-click="filterUsingAuthor()">Apply Filter</button>
+        <!-- <br>
+        <button type="button" class="btn btn-primary" ng-click="applyFilters()">Apply Filters</button>
+        <br> -->
+        <hr style="border-width: 2px; border-color: lightgray;">
+
+        <label>Ranking :</label>
+        <div class="radio">
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="rank" value="" checked> Show all books
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="rank" value="avgRating"> Show top 10 based on average rating
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="rank" value="numRatings"> Show top 10 based on number of rating
+            </label>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <div class="row book-list" infinite-load="pageBooks(false)" infinite-margin="200">
+
+      <div class="col-xs-6 col-sm-3 col-md-3 col-lg-2 book" ng-repeat="book in books">
+        <a href="#/library/book/{{ book.bookId }}" class="thumbnail">
+          <div class="image">
+            <img ng-src="api/library/{{book.bookId}}/cover" title="{{ book.title }}" />
+          </div>
+          <div class="caption">
+            <p class="text-primary text-center">{{ book.title }}</p>
+            <p class="text-muted text-center">{{ book.author }}</p>
+            <p class="text-center text-muted">Average Rating: {{ book.avg_rating }}</p>
+            <p class="text-center text-muted">Number of Ratings: {{ book.num_ratings }}</p>
+            <p class="text-center text-muted">Genres:
+              <span ng-repeat="genre in book.genres">{{ genre }},</span>
+            </p>
+          </div>
+        </a>
+      </div>
+
+      <div class="col-md-12 text-center" ng-show="!loading && books.length == 0">
+        No book
+      </div>
+
+      <div class="col-md-12 text-center" ng-show="loading">
+        <img src="img/loader.gif" />
+      </div>
+
+    </div>
+  </div>
+</div>

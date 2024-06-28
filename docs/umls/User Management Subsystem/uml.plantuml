@@ -1,0 +1,195 @@
+@startuml "User Management System"
+
+abstract class BaseResource {
+    # HttpServletRequest request;
+    # String appKey;
+    # IPrincipal principal;
+
+    # boolean authenticate()
+    # void checkBaseFunction(BaseFunction baseFunction)
+    # boolean hasBaseFunction(BaseFunction baseFunction)
+}
+
+class UserResource extends BaseResource {
+    + register(username: String, password: String, localeId: String, email: String): Response
+    + update(password: String, email: String, themeId: String, localeId: String, firstConnection: Boolean): Response
+    + update(username: String, password: String, email: String, themeId: String, localeId: String): Response
+    + checkUsername(username: String): Response
+    + login(username: String, password: String, longLasted: Boolean): Response
+    + logout(): Response
+    + delete(): Response
+    + delete(username: String): Response
+    + info(): Response
+    + view(username: String): Response
+    + list(limit: Integer, offset: Integer, sortColumn: Integer, asc: Boolean): Response
+    + session(): Response
+    + deleteSession(): Response
+}
+
+class User {
+    - id: String
+    - localeId: String
+    - roleId: String
+    - username: String
+    - password: String
+    - email: String
+    - theme: String
+    - firstConnection: Boolean
+    - createDate: Date
+    - deleteDate: Date
+
+    + isFirstConnection(): Boolean
+    + toString(): String
+}
+
+class UserDao {
+    + authenticate(username: String, password: String): String
+    + create(user: User): String
+    + update(user: User): User
+    + updatePassword(user: User): User
+    + getById(id: String): User
+    + getActiveByUsername(username: String): User
+    + getActiveByPasswordResetKey(passwordResetKey: String): User
+    + delete(username: String): void
+    # hashPassword(password: String): String
+    + findAll(paginatedList: PaginatedList, sortCriteria: SortCriteria): void
+}
+
+class UserDto {
+    - id: String
+    - localeId: String
+    - username: String
+    - email: String
+    - createTimestamp: Long
+}
+
+
+class ValidationUtil {
+  - {static} EMAIL_PATTERN: Pattern
+  - {static} HTTP_URL_PATTERN: Pattern
+  - {static} ALPHANUMERIC_PATTERN: Pattern
+  
+  + validateRequired(s: Object, name: String): void
+  + validateLength(s: String, name: String, lengthMin: Integer, lengthMax: Integer, nullable: Boolean): String
+  + validateLength(s: String, name: String, lengthMin: Integer, lengthMax: Integer): String
+  + validateStringNotBlank(s: String, name: String): String
+  + validateHexColor(s: String, name: String, nullable: Boolean): void
+  + validateEmail(s: String, name: String): void
+  + validateHttpUrl(s: String, name: String): String
+  + validateAlphanumeric(s: String, name: String): void
+  + validateDate(s: String, name: String, nullable: Boolean): Date
+  + validateLocale(localeId: String, name: String, nullable: Boolean): String
+  + validateTheme(themeId: String, name: String, nullable: Boolean): String
+}
+
+class Constants {
+    - {static} DEFAULT_LOCALE_ID: String
+    - {static} DEFAULT_TIMEZONE_ID: String
+    - {static} DEFAULT_THEME_ID: String
+    - {static} DEFAULT_ADMIN_PASSWORD: String
+    - {static} DEFAULT_USER_ROLE: String
+}
+
+
+class AuthenticationToken {
+    -id: String
+    -userId: String
+    -longLasted: Boolean
+    -createDate: Date
+    -lastConnectionDate: Date
+
+    + isLongLasted(): Boolean
+    + toString(): String
+}
+
+class AuthenticationTokenDao {
+    + get(id: String): AuthenticationToken
+    + create(authenticationToken: AuthenticationToken): String
+    + delete(authenticationTokenId: String): void
+    + deleteOldSessionToken(userId: String): void
+    + updateLastConnectionDate(id: String): void
+    + getByUserId(userId: String): List<AuthenticationToken>
+    + deleteByUserId(userId: String): void
+}
+       
+class TokenBasedSecurityFilter {
+    - {static} log: Logger {readOnly}
+    - {static} COOKIE_NAME: String {readOnly}
+    - {static} PRINCIPAL_ATTRIBUTE: String {readOnly}
+    - {static} TOKEN_LONG_LIFETIME: Integer {readOnly}
+    - {static} TOKEN_SESSION_LIFETIME: Integer {readOnly}
+
+    + init(filterConfig: FilterConfig): void
+    + destroy(): void
+    + doFilter(req: ServletRequest, response: ServletResponse, filterChain: FilterChain): void
+    + isTokenExpired(authenticationToken: AuthenticationToken): Boolean
+    + injectAuthenticatedUser(request: HttpServletRequest, user: User): void
+    + injectAnonymousUser(request: HttpServletRequest): void
+}
+
+enum BaseFunction {
+  ADMIN
+}
+
+class RoleBaseFunctionDao {
+    + findByRoleId(roleId: String): Set<String>
+}
+
+
+' UserResource --> BaseFunction
+
+
+class PaginatedList {
+  - limit: Integer
+  - offset: Integer
+  - resultCount: Integer
+  - resultList: List<T>
+}
+
+class PaginatedLists {
+  - {static} DEFAULT_PAGE_SIZE: Integer = 10
+  - {static} MAX_PAGE_SIZE: Integer: 100
+
+  + {static} create(pageSize: Integer, offset: Integer): PaginatedList<E>
+  + {static} create(): PaginatedList<E>
+  + {static} executeCountQuery(paginatedList: PaginatedList<E>, queryParam: QueryParam): void
+  - executeResultQuery(paginatedList: PaginatedList<E>, queryParam: QueryParam): List<E>
+  + executePaginatedQuery(paginatedList: PaginatedList<E>, queryParam: QueryParam): List<E>
+  + executePaginatedQuery(paginatedList: PaginatedList<E>, queryParam: QueryParam, sortCriteria: SortCriteria): List<E>
+}
+
+
+class SortCriteria {
+  - column: Integer
+  - asc: Boolean
+  + getColumn(): Integer
+  + isAsc(): Boolean
+}
+
+UserResource *-- User: create, modify, delete
+UserResource "1" *-- "1" UserDao
+UserDao "1" o-- "0..*" User
+UserResource --> UserDto: <<uses>>
+
+UserResource --> Constants: <<uses>>
+UserResource --> ValidationUtil: <<uses>>
+
+UserResource *-- AuthenticationToken: create new session
+UserResource "1" *-- "1" AuthenticationTokenDao: <<usue>>
+UserResource --> TokenBasedSecurityFilter: <<uses>>
+
+UserResource "1" *-- "1" RoleBaseFunctionDao
+
+TokenBasedSecurityFilter -- AuthenticationTokenDao: gets server token\n<<uses>> 
+TokenBasedSecurityFilter --  RoleBaseFunctionDao: add base function\n<<uses>>
+TokenBasedSecurityFilter --> UserDao: <<uses>>
+
+UserResource --> PaginatedLists: list of active users
+PaginatedLists -- PaginatedList: Utilities for paginates list >
+
+UserResource --> SortCriteria: <<uses>>
+
+UserDao --> PaginatedLists : <<uses>>
+UserDao --> SortCriteria: <<uses>>
+
+@enduml

@@ -1,0 +1,130 @@
+@startuml "Bookshelf Management Subsystem"
+
+abstract class BaseResource {
+  # HttpServletRequest request;
+  # String appKey;
+  # IPrincipal principal;
+
+  # boolean authenticate()
+  # void checkBaseFunction(BaseFunction baseFunction)
+  # boolean hasBaseFunction(BaseFunction baseFunction)
+}
+
+class TagResource extends BaseResource {
++ list() : Response
++ add(name : String, color : String) : Response
++ update(id : String, name : String, color : String) : Response
++ delete(tagId : String) : Response
+}
+
+class TagDao {
++ getById(id : String) : Tag
++ getByUserId(userId : String) : List<Tag>
++ updateTagList(userBookId : String, tagIdSet : Set<String>) : void
++ getByUserBookId(userBookId : String) : List<TagDao>
++ create(tag : Tag) : String
++ getByName(userId : String, name : String) : Tag
++ getByTagId(userId : String, tagId : String) : Tag
++ delete(tagId : String) : void
++ findByName(userId : String, name : String) : List<Tag>
+}
+
+class Tag {
+- id : String
+- name : String
+- userId : String
+- createDate : String
+- deleteDate : Date
+- color : String
++ toString() : String
+}
+
+
+
+class ValidationUtil {
+  - {static} EMAIL_PATTERN: Pattern
+  - {static} HTTP_URL_PATTERN: Pattern
+  - {static} ALPHANUMERIC_PATTERN: Pattern
+  + validateRequired(s: Object, name: String): void
+  + validateLength(s: String, name: String, lengthMin: Integer, lengthMax: Integer, nullable: Boolean): String
+  + validateLength(s: String, name: String, lengthMin: Integer, lengthMax: Integer): String
+  + validateStringNotBlank(s: String, name: String): String
+  + validateHexColor(s: String, name: String, nullable: Boolean): void
+  + validateEmail(s: String, name: String): void
+  + validateHttpUrl(s: String, name: String): String
+  + validateAlphanumeric(s: String, name: String): void
+  + validateDate(s: String, name: String, nullable: Boolean): Date
+  + validateLocale(localeId: String, name: String, nullable: Boolean): String
+  + validateTheme(themeId: String, name: String, nullable: Boolean): String
+}
+
+class ThreadLocalContext {
++ {static} threadLocalContext : ThreadLocal<ThreadLocalcontext> = new ThreadLocal<ThreadLocalContext> {readOnly}
+- entityManager : EntityManager
++ {static} get() : ThreadLocalContext
++ {static} cleanup() : void
++ isInTransactionalContext() : boolean
+}
+
+class UserBookTag {
+- {static} serialVersionUID : Long = 1L {readOnly}
+- id : String
+- userBookId : String
+- tagId : String
++ hashCode() : Integer
++ equals(obj : Object) : Boolean
++ toString() : String 
+} 
+
+class TagDto {
+- id : String
+- name : String
+- color : String
+}
+
+class BookResource extends BaseResource {
+  + add(isbn: String): Response
+  + delete(userBookId: String): Response
+  + add(title: String, subtitle: String, author: String, description: String, isbn10: String, isbn13: String, pageCount: Long, language: String, publishDateStr: String, tagList: List<String>): Response
+  + update(userBookId: String, title: String, subtitle: String, author : String,description : String, isbn10: String, isbn13: String, pageCount : Long, language: String, publishDateStr : String, tagList : List<String>) : Response
+  + get(userBookId: String) : Response
+  + cover(userBookId: String) : Response
+  + updateCover(userBookId: String, imageUrl : String) : Response
+  + list(limit : Integer, offset : Integer, sortColumn : Integer, asc : Boolean, search : String, read : Boolean, tagName : String) : Response
+  + importFile(fileBodyPart:FormDataBodyType): Response
+  + read(userBookId: String, read : boolean): Response
+}
+
+class Book {
+  - id: Long
+  - title: String
+  - author: String
+  - publishedDate: Date
+}
+
+' TagResource "1" --> "1" TagDao: <<uses>>
+' TagResource "1" o-- "0..*" Tag: <<manages>>
+' TagResource "1" --> "1" ValidationUtil: <<uses>>
+' TagDao "1" --> "1" ThreadLocalContext: <<uses>>
+' TagDao "1" --> "0..*" UserBookTag: <<updates>>
+' TagDao "1" *-- "0..*" TagDto: <<uses>>
+
+User "1..*" -- "0..*" Book
+(User, Book) .. BookResource: creates, adds, deletes
+
+TagResource "1" *-- "1" TagDao: get tag\n
+' TagResource "1" o-- "0..*" Tag: manages
+
+TagResource --> ValidationUtil: validates inut data\n<<uses>>
+
+TagDao "1" --> "0..*" UserBookTag: <<updates>>
+TagDao "1" --> "1" ThreadLocalContext: <<uses>>
+
+' TagDao "1" *-- "0..*" TagDto
+TagResource --> TagDto: <<uses>>
+BookResource "1" *-- "1" TagDao
+BookResource "1" --> "1" ValidationUtil: <<uses>>
+TagDao "1" o-- "0..*" Tag
+
+
+@enduml

@@ -1,0 +1,106 @@
+@startuml "Strategy Pattern"
+
+class AppContext <<Context>> {
+
+    + getStrategy()
+}
+
+' abstract class AbstractIdleService {
+'     # statrtUp(): void
+'     # shutDown(): void
+'     # callAPI(): JsonNode
+' }
+
+interface ServiceStrategy <<Strategy>> {
+
+    + callAPI()
+}
+
+' class AudiobookResource <<Client>> {
+
+' }
+
+' note bottom of AudiobookResource
+'     ServiceStrategy str = new ServiceProvider() 
+'     // can be SpotifyAudiobookService or itunesAudiobookService
+'     AppContext.getInstance().getStrategy(str).searchAudiobook("name")
+' end note
+
+class SpotifyDataService {
+
+    + callAPI(): JsonNode
+
+}
+
+class itunesDataService {
+
+    + callAPI(): JsonNode
+
+}
+
+class PodcastResource <<Client>> {
+
+}
+
+note bottom of PodcastResource
+    ServiceStrategy str = new ServiceProvider() 
+    // can be SpotifyPodcastService or itunesPodcastService
+    AppContext.getInstance().getStrategy(str).searchPodcast("name")
+end note
+
+' abstract class AudiobookService <<Strategy>> {
+
+'     + searchAudiobook(String name)
+
+' }
+
+' class SpotifyAudiobookService <<ConcreteStrategy>> {
+
+'     + searchAudiobook(String name)
+
+' }
+
+' class itunesAudiobookService <<ConcreteStrategy>> {
+
+'     + searchAudiobook(String name)
+
+' }
+
+' abstract class PodcastService <<Strategy>> {
+
+'     + searchPodcast(String name)
+
+' }
+
+class SpotifyPodcastService <<ConcreteStrategy>> {
+
+    + searchPodcast(String name)
+
+}
+
+class itunesPodcastService <<ConcreteStrategy>> {
+
+    + searchPodcast(String name)
+
+}
+
+PodcastResource -up-> AppContext
+' AudiobookResource -up-> AppContext
+
+AppContext o-right-> ServiceStrategy
+
+ServiceStrategy <|-- SpotifyDataService
+ServiceStrategy <|-- itunesDataService
+
+' SpotifyDataService <|-- SpotifyAudiobookService
+' itunesDataService <|-- itunesAudiobookService
+
+SpotifyDataService <|-- SpotifyPodcastService
+itunesDataService <|-- itunesPodcastService
+
+' AppContext o-right-> AbstractIdleService
+
+' AbstractIdleService <|.. SpotifyPodcastService
+' AbstractIdleService <|.. itunesPodcastService
+
+@enduml

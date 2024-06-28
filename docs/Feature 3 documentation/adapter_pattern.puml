@@ -1,0 +1,43 @@
+@startuml
+
+' class Book <<Target>> {
+
+' }
+
+' class AudiobookAdapter <<Adapter>> {
+
+' }
+
+' class Audiobook <<Adaptee>> {
+
+' }
+
+' class AudiobookResource <<Client>> {
+
+' }
+
+' Book <|-- AudiobookAdapter
+' AudiobookAdapter -right-> Audiobook
+' AudiobookResource -right-> Book
+
+class Book <<Target>> {
+
+}
+
+class PodcastAdapter <<Adapter>> {
+
+}
+
+class Podcast <<Adaptee>> {
+
+}
+
+class PodcastResource <<Client>> {
+
+}
+
+Book <|-- PodcastAdapter
+PodcastAdapter -right-> Podcast
+PodcastResource -right-> Book
+
+@enduml

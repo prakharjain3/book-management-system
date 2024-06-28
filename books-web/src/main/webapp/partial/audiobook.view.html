@@ -1,0 +1,26 @@
+<div class="row" ng-show="!book">
+    <div class="col-md-12">
+      <img src="img/loader.gif" />
+    </div>
+  </div>
+  
+  <div class="row" ng-show="book">
+    <div class="col-md-12">
+      <h2>{{ book.title }} {{ book.subtitle }} <small>{{ book.author }}</small></h2>
+    
+      <p class="pull-left">
+        <img ng-if="book && !coverChanging" ng-src="api/book/{{ book.id }}/cover" class="cover-book-view" />
+        <img src="img/loader.gif" ng-if="coverChanging" />
+      </p>
+      <p ng-bind-html="book.description" class="clearfix"><div ></div></p>
+  
+      <dl class="dl-horizontal">
+        <dt>Publication date</dt>
+        <dd>{{ book.create_date | date: 'dd/MM/yyyy' }}</dd>
+        <dt ng-if="book.language">Language</dt>
+        <dd ng-if="book.language"><img ng-src="img/flags/{{ book.language }}.png" /></dd>
+        <dt>Add to Favourites</dt>
+        <dd><input type="checkbox" ng-model="book.favourite" />{{ favourite }}</dd>
+      </dl>
+    </div>
+  </div>

@@ -1,0 +1,9 @@
+Assuming we're on the same branch where we commited our changes to
+
+commit.txt contains commit information. This is also created by the llm.
+
+issues.txt contains issue information. This is also created by the llm.
+
+a library called GitPython needs to be installed.
+
+Assuming PR.py script is running in a directory within the Git repository

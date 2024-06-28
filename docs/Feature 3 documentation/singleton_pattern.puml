@@ -1,0 +1,33 @@
+@startuml
+
+class AppContext <<Singleton>> {
+    - {static} instance: AppContext
+    - AppContext()
+    + {static} getInstance(): AppContext
+    + Context getStrategy(): Strategy
+}
+
+note bottom of AppContext
+    public static AppContext getInstance() {
+        if (instance == null) {
+            instance = new AppContext();
+        }
+        return instance;
+    }
+end note
+
+class AudiobookResource <<Client>> {
+
+}
+
+class PodcastResource <<Client>> {
+    
+}
+
+AppContext <-- AppContext
+
+AppContext <-left- AudiobookResource
+AppContext <-left- PodcastResource
+
+
+@enduml

@@ -1,0 +1,57 @@
+<div class="row">
+  <p style="font-size: large; font-weight:700; margin-left: 1.2vw">
+    Audiobooks
+  </p>
+
+  <div class="col-md-12">
+    <div class="well well-sm">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span> Search on Spotify </h3>
+        </div>
+        <div class="panel-body">
+          <form role="form">
+            <div class="form-group">
+              <label for="inputSpotifyName">Name on Spotify</label>
+              <input type="text" class="form-control" id="inputSpotifyName" ng-model="spotifyName" placeholder="Name" />
+            </div>
+            <button type="submit" class="btn btn-primary" ng-click="searchSpotify()">Search</button>
+
+            <div class="form-group" ng-show="spotifyResults.length > 0">
+              <label for="inputSpotifyResults">Results</label>
+              <select class="form-control" id="spotifyResult" ng-model="spotifyResult" ng-options="item.audiobook.name for item in spotifyResults track by item.index" ng-change="addSpotify(spotifyResult.index)"></select>
+                <option value="" disabled selected hidden>
+                  Select an audiobook
+                </option>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><span class="glyphicon glyphicon-pencil"></span> Search on Itunes</h3>
+        </div>
+        <div class="panel-body">
+          <form role="form">
+            <div class="form-group">
+              <label for="inputItunesName">Name on Itunes</label>
+              <input type="text" class="form-control" id="inputItunesName" ng-model="itunesName" placeholder="Name" />
+            </div>
+            <button type="submit" class="btn btn-primary" ng-click="searchItunes()">Search</button>
+          
+            <div class="form-group" ng-show="itunesResults.length > 0">
+              <label for="inputItunesResults">Results</label>
+              <select class="form-control" id="itunesResult" ng-model="itunesResult" ng-options="item.audiobook.collectionName for item in itunesResults track by item.index" ng-change="addItunes(itunesResult.index)"></select>
+                <option value="" disabled selected hidden>
+                  Select an audiobook
+                </option>
+              </select>
+            </div>          
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

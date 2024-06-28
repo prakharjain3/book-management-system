@@ -1,0 +1,44 @@
+@startuml "Factory Pattern"
+
+abstract class CreatorFactory <<Creator>> {
+    + buildContent(): Content
+}
+
+abstract class SpotifyPodcastService <<ConcreteCreator>> {
+    + buildContent(): Content
+}
+
+abstract class SpotifyAudiobookService <<ConcreteCreator>> {
+    + buildContent(): Content
+}
+
+abstract class ItunesPodcastService <<ConcreteCreator>> {
+    + buildContent(): Content
+}
+
+abstract class ItunesAudiobookService <<ConcreteCreator>> {
+    + buildContent(): Content
+}
+
+interface Content <<Product>> {
+
+} 
+
+class Podcast <<ConcreteProduct>> {
+
+}   
+
+class Audiobook <<ConcreteProduct>> {
+
+}
+
+CreatorFactory <|-- SpotifyAudiobookService
+CreatorFactory <|-- SpotifyPodcastService
+
+CreatorFactory <|-- ItunesAudiobookService
+CreatorFactory <|-- ItunesPodcastService
+
+CreatorFactory .right.> Content
+
+Content <|.. Podcast
+Content <|.. Audiobook

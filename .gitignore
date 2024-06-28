@@ -1,0 +1,18 @@
+/*/.classpath
+/*/.project
+/*/.settings
+/*/bin
+/*/gen
+/*/target
+/*/*.iml
+/out
+/.idea
+__pycache__
+.env
+bin/
+*/codemr/
+Code\ Metrics\ Tools
+**/.DS_Store
+.vscode/
+.idea/
+books-web/sismicsbooks
